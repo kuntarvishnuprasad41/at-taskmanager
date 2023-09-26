@@ -48,7 +48,7 @@ taskRoutes.post("/", (req, res) => {
         if(err) {
             return res.status(500).send("Something went wrong while creating the task");
         } else {
-            return res.status(201).send(validator.validateCourseInfo(userProvidedDetails).message);
+            return res.status(201).send(validator.tasksValidation(userProvidedDetails).message);
         }
     });
     res.status(200).send(validator.tasksValidation(taskData, userRequest));
@@ -67,8 +67,12 @@ taskRoutes.put("/:id", (req, res) => {
       taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
     )
   );
+
+  
+  
   obj.tasks.push(userRequest);
   if (validator.updateValidation(userRequest)) {
+
     fs.writeFile(writePath, JSON.stringify(obj), {
       encoding: "utf-8",
       flag: "w",
@@ -77,7 +81,7 @@ taskRoutes.put("/:id", (req, res) => {
         if(err) {
             return res.status(500).send("Something went wrong while updating the task");
         } else {
-            return res.status(201).send(validator.validateCourseInfo(userProvidedDetails).message);
+            return res.status(201).send(validator.tasksValidation(userProvidedDetails).message);
         }
     }
     );
@@ -104,7 +108,7 @@ taskRoutes.delete("/:id", (req, res) => {
     if(err) {
         return res.status(500).send("Something went wrong while deleting the task");
     } else {
-        return res.status(201).send(validator.validateCourseInfo(userProvidedDetails).message);
+        return res.status(201).send(validator.tasksValidation(userProvidedDetails).message);
     }
 }
   );

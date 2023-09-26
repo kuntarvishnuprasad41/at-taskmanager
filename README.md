@@ -16,31 +16,31 @@ The generat format of tasksList is as follows
 ## APIs
 
 ### GET : Tasks
-    - This api will list all the tasks stored in the file
-    ENDPOINT : ``` \tasks ```
+- This api will list all the tasks stored in the file
+  ENDPOINT : ``` \tasks ```
 
 ### GET : Tasks by ID
-    - This api will fetch task by id
-    ENDPOINT : ``` \tasks\task_id ```
+- This api will fetch task by id
+  ENDPOINT : ``` \tasks\task_id ```
 
 ### POST : Tasks
-    - This API is responsible for Creating the tasks
-    ENDPOINT : ``` \tasks ```
+- This API is responsible for Creating the tasks
+  ENDPOINT : ``` \tasks ```
 
 ### PUT : Tasks
-    - API responsible for updating the tasks
-    ENDPOINT : ``` \tasks\task_id ```
+- API responsible for updating the tasks
+  ENDPOINT : ``` \tasks\task_id ```
 
 ### DELETE : Tasks
-    - API responsible for deleting the tasks
-    ENDPOINT : ``` \tasks\task_id ```
+- API responsible for deleting the tasks
+  ENDPOINT : ``` \tasks\task_id ```
 
 ### GET : PRIORITY
 It fetches the list on "from - to " basis, i.e, if high selected, High to low else vise versa
 Priorities available 
 - [x] High
 - [x] Low
-- [] Medium 
+- [ ] Medium 
 ENDPOINT : ``` \tasks\priority\highorlow ```
 
 

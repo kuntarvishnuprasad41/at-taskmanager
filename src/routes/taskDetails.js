@@ -20,6 +20,7 @@ taskRoutes.get("/:id", (req, res) => {
                 taskData.tasks.filter((tasks) => tasks.task_id == req.params.id)
             )
         );
+
 });
 
 taskRoutes.get("/priority/:prioriy", (req, res) => {
@@ -39,6 +40,9 @@ taskRoutes.get("/priority/:prioriy", (req, res) => {
 
 taskRoutes.post("/", (req, res) => {
     let userRequest = req.body;
+
+    let {task_id,task} = req.body;
+    console.log(task_id);
     let writePath = path.join(__dirname, "..", "tasks.json");
     if (validator.tasksValidation(taskData, userRequest).status) {
         let tasksDataModified = JSON.parse(JSON.stringify(taskData));
@@ -46,9 +50,9 @@ taskRoutes.post("/", (req, res) => {
 
         fs.writeFile(writePath, JSON.stringify(tasksDataModified), { encoding: 'utf8', flag: 'w' }, (err, data) => {
             if (err) {
-                return res.status(500).send("Something went wrong while creating the task");
+                return false
             } else {
-                return res.status(201).send(validator.tasksValidation(userProvidedDetails).message);
+                return true
             }
         });
         res.status(200).send(validator.tasksValidation(taskData, userRequest));

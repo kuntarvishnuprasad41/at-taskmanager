@@ -50,12 +50,12 @@ taskRoutes.post("/", (req, res) => {
 
         fs.writeFile(writePath, JSON.stringify(tasksDataModified), { encoding: 'utf8', flag: 'w' }, (err, data) => {
             if (err) {
-                return false
+                return res.status(500).send("Something went wrong while adding");
             } else {
-                return true
+                return res.status(201).send(validator.tasksValidation(taskData, userRequest).message);
             }
         });
-        res.status(200).send(validator.tasksValidation(taskData, userRequest));
+        
     } else {
         res.status(500).send(validator.tasksValidation(taskData, userRequest));
     }

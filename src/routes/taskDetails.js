@@ -73,7 +73,6 @@ taskRoutes.post("/", (req, res) => {
     userRequest.task_name = reqBody.task_name;
     userRequest.task_description = reqBody.task_description;
     userRequest.priority = reqBody.priority;  
-    userRequest.priority = reqBody.priority;
     userRequest.created_at = timestamp();  
     userRequest.updated_at = timestamp();
 
@@ -101,27 +100,32 @@ taskRoutes.post("/", (req, res) => {
  * Params needed @task_name @task_description @task_progress @progress @priority 
  */
 taskRoutes.put("/:id", (req, res) => {
-    let userRequest = req.body;
+    let reqBody = req.body;
+    let userRequest = new Object();
     userRequest.task_id = req.params.id;
+    userRequest.task_name = reqBody.task_name;
+    userRequest.task_description = reqBody.task_description;
+    userRequest.priority = reqBody.priority;  
+    userRequest.task_status = reqBody.task_status;
+    userRequest.created_at = validator.getCreatedAt(taskData,req.params.id)[0].created_at;
     userRequest.updated_at = timestamp();
-    let obj = new Object();
-    let ifExists = taskData.tasks.filter((tasks) => tasks.task_id == req.params.id).length;
 
-    if(ifExists){
+    let obj = new Object();
+
+    if(validator.updateValidation(taskData,userRequest,userRequest.task_id).status){
         obj.tasks = JSON.parse(
             JSON.stringify(
                 taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
             )
         );
 
-        obj.tasks.push(userRequest);
-        if (validator.updateValidation(userRequest)) {
+        
 
-            if(writeToFile(obj)){
-                res.status(201).send({"message":"task updated successfully"});
-            }else{
-                res.status(500).send({"message":"Something went wrong while updating"});
-            }
+        obj.tasks.push(userRequest);
+        if(writeToFile(obj)){
+            res.status(201).send({"message":"task updated successfully",data:userRequest});
+        }else{
+            res.status(500).send({"message":"Something went wrong while updating"});
         }
     }else{
         res.status(500).send({"message":"Data Not Found"});

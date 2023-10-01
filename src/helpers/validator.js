@@ -30,11 +30,13 @@ class validator {
         return !(isIdFound);
     }
 
-    static updateValidation(userRequest) {
+    static updateValidation(taskData,userRequest,task_id) {
         if (
-            userRequest.hasOwnProperty("task_id") &&
             userRequest.hasOwnProperty("task_name") &&
-            userRequest.hasOwnProperty("task_description")
+            userRequest.hasOwnProperty("task_description") &&
+            userRequest.hasOwnProperty("task_status") &&
+            userRequest.hasOwnProperty("priority") &&
+            this.isTaskExists(taskData,task_id)
         ) {
             return {
                 status: true,
@@ -45,6 +47,18 @@ class validator {
                 status: false,
                 message: "Invalid Data",
             };
+    }
+
+    static isTaskExists(tasksData, userRequest) {
+        let isIdFound = tasksData.tasks.some(
+            (ind) => ind.task_id === userRequest.task_id
+        );
+        return !isIdFound.size;
+    }
+
+    static getCreatedAt(taskData,task_id){
+        let task = taskData.tasks.filter((data)=> data.task_id == task_id);
+        return task;
     }
 }
 

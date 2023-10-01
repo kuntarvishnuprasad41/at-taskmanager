@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const routes = require("express").Router();
 const tasksDetails = require("./routes/taskDetails");
+const dotenv = require('dotenv').config();
+
+
 
 const app = express();
 
@@ -11,13 +14,13 @@ app.use(routes);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const PORT = 3000;
+const PORT = process.env.PORT;  
 
 app.get("/", (req, res) => {
     res.status(200).send("<h2>Taskmanager Assignment </h2>");
 });
 
-routes.use("/tasks", tasksDetails);
+routes.use("/api/tasks", tasksDetails);  // Best practice to start with /api/
 
 app.listen(PORT, (error) => {
     if (!error)

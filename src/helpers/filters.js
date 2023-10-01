@@ -1,6 +1,7 @@
 const tasksData = require('../data/data.json');
 
 //filter type 1 is to filter by id
+//filter type 2 is to reverse filter by id
 
 function filterData(task_id,type){
     switch(type){

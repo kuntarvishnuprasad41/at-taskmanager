@@ -3,7 +3,8 @@ const taskData = require("../data/data.json");
 const bodyParser = require("body-parser");
 const writeToFile = require('../helpers/writeToFile')
 const validator = require("../helpers/validator");
-const {filterData,sortByPriority} = require('../helpers/filters');
+const getTimeStamp = require('../helpers/utils')
+const { filterData, sortByPriority } = require('../helpers/filters');
 const { v4: uuidv4 } = require('uuid');
 const timestamp = require('time-stamp');
 
@@ -33,7 +34,7 @@ taskRoutes.get("/:id", (req, res) => {
         .status(200)
         .send(
             //filter type 1 is to filter by id
-                filterData(req.params.id, 1)
+            filterData(req.params.id, 1)
         );
 
 });
@@ -45,8 +46,8 @@ taskRoutes.get("/:id", (req, res) => {
  * Endpoint /api/tasks/priority/{high or low}
  */
 taskRoutes.get("/priority/:prioriy", (req, res) => {
-        res.status(200).send(sortByPriority(req.params.prioriy));
-    
+    res.status(200).send(sortByPriority(req.params.prioriy));
+
 });
 
 
@@ -58,26 +59,23 @@ taskRoutes.get("/priority/:prioriy", (req, res) => {
  */
 taskRoutes.post("/", (req, res) => {
     let reqBody = JSON.parse(JSON.stringify(req.body));
-
     let userRequest = new Object();
     userRequest.task_id = uuidv4();
     userRequest.task_name = reqBody.task_name;
     userRequest.task_description = reqBody.task_description;
-    userRequest.priority = reqBody.priority;  
-    userRequest.created_at = getTimeStamp();  
+    userRequest.priority = reqBody.priority;
+    userRequest.created_at = getTimeStamp();
     userRequest.updated_at = getTimeStamp();
-
 
     if (validator.tasksValidation(taskData, userRequest).status) {
         let tasksDataModified = JSON.parse(JSON.stringify(taskData));
         tasksDataModified.tasks.push(userRequest);
 
-        if(writeToFile(tasksDataModified)){
-            res.status(201).send({"message":"Task added successfully","data":userRequest});
-        }else {
-            res.status(500).send({"message":"Something went wrong while adding the task"});
+        if (writeToFile(tasksDataModified)) {
+            res.status(201).send({ "message": "Task added successfully", "data": userRequest });
+        } else {
+            res.status(500).send({ "message": "Something went wrong while adding the task" });
         }
-        
     } else {
         res.status(500).send(validator.tasksValidation(taskData, userRequest));
     }
@@ -96,27 +94,24 @@ taskRoutes.put("/:id", (req, res) => {
     userRequest.task_id = req.params.id;
     userRequest.task_name = reqBody.task_name;
     userRequest.task_description = reqBody.task_description;
-    userRequest.priority = reqBody.priority;  
+    userRequest.priority = reqBody.priority;
     userRequest.task_status = reqBody.task_status;
-    userRequest.created_at = validator.getCreatedAt(taskData,req.params.id)[0].created_at;
+    userRequest.created_at = validator.getCreatedAt(taskData, req.params.id)[0].created_at;
     userRequest.updated_at = getTimeStamp();
-
     let obj = new Object();
 
-    if(validator.updateValidation(taskData,userRequest,userRequest.task_id).status){
-        obj.tasks = filterData(req.params.id,2)
-
-        
-
+    if (validator.updateValidation(taskData, userRequest, userRequest.task_id).status) {
+        //filter type 2 is to reversefilter by id
+        obj.tasks = filterData(req.params.id, 2)
         obj.tasks.push(userRequest);
-        if(writeToFile(obj)){
-            res.status(201).send({"message":"task updated successfully",data:userRequest});
-        }else{
-            res.status(500).send({"message":"Something went wrong while updating"});
+        if (writeToFile(obj)) {
+            res.status(201).send({ "message": "task updated successfully", data: userRequest });
+        } else {
+            res.status(500).send({ "message": "Something went wrong while updating" });
         }
-    }else{
-        res.status(500).send({"message":"Data Not Found"});
-    }    
+    } else {
+        res.status(500).send({ "message": "Data Not Found" });
+    }
 });
 
 
@@ -127,11 +122,8 @@ taskRoutes.put("/:id", (req, res) => {
  */
 taskRoutes.delete("/:id", (req, res) => {
     let obj = new Object();
-    obj.tasks = JSON.parse(
-        JSON.stringify(
-            taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
-        )
-    );
+    //filter type 2 is to reversefilter by id
+    obj.tasks = filterData(req.params.id, 2)
     let writePath = path.join(__dirname, "..", "tasks.json");
     fs.writeFile(writePath, JSON.stringify(obj), {
         encoding: "utf-8",
@@ -148,9 +140,7 @@ taskRoutes.delete("/:id", (req, res) => {
     res.status(200).send(obj);
 });
 
-function getTimeStamp(){
-    return timestamp("YYYYMMDDHHmmss")
-}
+
 
 
 module.exports = taskRoutes;

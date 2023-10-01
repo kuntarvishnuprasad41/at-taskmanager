@@ -8,10 +8,23 @@ const validator = require("../helpers/validator");
 taskRoutes.use(bodyParser.urlencoded({ extended: false }));
 taskRoutes.use(bodyParser.json());
 
+
+
+/**
+ *  This API lists all the tasks
+ *  Method : GET
+ *  Endpoint /api/tasks
+ */
 taskRoutes.get("/", (req, res) => {
     res.status(200).send(taskData.tasks);
 });
 
+
+/**
+ *  Lists task by id 
+ *  Method : GET
+ *  Endpoint /api/tasks/id
+ */
 taskRoutes.get("/:id", (req, res) => {
     res
         .status(200)
@@ -23,6 +36,12 @@ taskRoutes.get("/:id", (req, res) => {
 
 });
 
+
+/**
+ * Lists task by priority 
+ * Method : GET
+ * Endpoint /api/tasks/priority/{high or low}
+ */
 taskRoutes.get("/priority/:prioriy", (req, res) => {
     let priority = req.params.prioriy;
     if (priority == "low") {
@@ -38,11 +57,15 @@ taskRoutes.get("/priority/:prioriy", (req, res) => {
     }
 });
 
+
+/**
+ * Create the task
+ * Method : POST
+ * Endpoint /api/tasks/
+ * Params needed @task_name @task_description @task_progress @progress @priority 
+ */
 taskRoutes.post("/", (req, res) => {
     let userRequest = req.body;
-
-    let {task_id,task} = req.body;
-    console.log(task_id);
     let writePath = path.join(__dirname, "..", "tasks.json");
     if (validator.tasksValidation(taskData, userRequest).status) {
         let tasksDataModified = JSON.parse(JSON.stringify(taskData));
@@ -61,9 +84,15 @@ taskRoutes.post("/", (req, res) => {
     }
 });
 
+
+/**
+ * Update the task
+ * Method : PUT
+ * Endpoint /api/tasks/task_id
+ * Params needed @task_name @task_description @task_progress @progress @priority 
+ */
 taskRoutes.put("/:id", (req, res) => {
     let userRequest = req.body;
-    let taskId = req.body.task_id;
     let writePath = path.join(__dirname, "..", "tasks.json");
     let obj = new Object();
     obj.tasks = JSON.parse(
@@ -96,6 +125,12 @@ taskRoutes.put("/:id", (req, res) => {
     }
 });
 
+
+/**
+ * Delete the task
+ * Method : DELETE
+ * Endpoint /api/tasks/task_id
+ */
 taskRoutes.delete("/:id", (req, res) => {
     let obj = new Object();
     obj.tasks = JSON.parse(

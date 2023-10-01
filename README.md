@@ -5,35 +5,37 @@ This API is used to perform CRUD operations on tasks
 The generat format of tasksList is as follows 
 ```
     {
-      "task_id": 1,
-      "task": "Task Name",
-      "task_description": "Task Description",
-      "task_status": "WIP",
-      "priority": 0
-    }
+        "task_id : 1
+        "task_name": "Redd1is {{task_id}}",
+        "task_description": "Learn Reddis",
+        "task_status": "WIP",
+        "priority": 0,
+        "created_at" : "",
+        "updated-at" : ""
+}
 ```
 
 ## APIs
 
 ### GET : Tasks
 - This api will list all the tasks stored in the file
-  ENDPOINT : ``` \tasks ```
+  ENDPOINT : ``` /api/tasks ```
 
 ### GET : Tasks by ID
 - This api will fetch task by id
-  ENDPOINT : ``` \tasks\task_id ```
+  ENDPOINT : ``` /api/tasks/task_id ```
 
 ### POST : Tasks
 - This API is responsible for Creating the tasks
-  ENDPOINT : ``` \tasks ```
+  ENDPOINT : ``` /api/tasks ```
 
 ### PUT : Tasks
 - API responsible for updating the tasks
-  ENDPOINT : ``` \tasks\task_id ```
+  ENDPOINT : ``` /api/tasks/task_id ```
 
 ### DELETE : Tasks
 - API responsible for deleting the tasks
-  ENDPOINT : ``` \tasks\task_id ```
+  ENDPOINT : ``` /api/tasks/task_id ```
 
 ### GET : PRIORITY
 It fetches the list on "from - to " basis, i.e, if high selected, High to low else vise versa
@@ -41,7 +43,7 @@ Priorities available
 - [x] High
 - [x] Low
 - [ ] Medium 
-ENDPOINT : ``` \tasks\priority\highorlow ```
+ENDPOINT : ``` /api/tasks/priority/highorlow ```
 
 
 ## Additional submission

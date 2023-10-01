@@ -1,9 +1,10 @@
 const taskRoutes = require("express").Router();
-const taskData = require("../tasks.json");
+const taskData = require("../data/data.json");
 const bodyParser = require("body-parser");
-const path = require("path");
-const fs = require("fs");
+const writeToFile = require('../helpers/writeToFile')
 const validator = require("../helpers/validator");
+const { v4: uuidv4 } = require('uuid');
+const timestamp = require('time-stamp');
 
 taskRoutes.use(bodyParser.urlencoded({ extended: false }));
 taskRoutes.use(bodyParser.json());
@@ -65,19 +66,27 @@ taskRoutes.get("/priority/:prioriy", (req, res) => {
  * Params needed @task_name @task_description @task_progress @progress @priority 
  */
 taskRoutes.post("/", (req, res) => {
-    let userRequest = req.body;
-    let writePath = path.join(__dirname, "..", "tasks.json");
+    let reqBody = JSON.parse(JSON.stringify(req.body));
+
+    let userRequest = new Object();
+    userRequest.task_id = uuidv4();
+    userRequest.task_name = reqBody.task_name;
+    userRequest.task_description = reqBody.task_description;
+    userRequest.priority = reqBody.priority;  
+    userRequest.priority = reqBody.priority;
+    userRequest.created_at = timestamp();  
+    userRequest.updated_at = timestamp();
+
+
     if (validator.tasksValidation(taskData, userRequest).status) {
         let tasksDataModified = JSON.parse(JSON.stringify(taskData));
         tasksDataModified.tasks.push(userRequest);
 
-        fs.writeFile(writePath, JSON.stringify(tasksDataModified), { encoding: 'utf8', flag: 'w' }, (err, data) => {
-            if (err) {
-                return res.status(500).send("Something went wrong while adding");
-            } else {
-                return res.status(201).send(validator.tasksValidation(taskData, userRequest).message);
-            }
-        });
+        if(writeToFile(tasksDataModified)){
+            res.status(201).send({"message":"Task added successfully","data":userRequest});
+        }else {
+            res.status(500).send({"message":"Something went wrong while adding the task"});
+        }
         
     } else {
         res.status(500).send(validator.tasksValidation(taskData, userRequest));
@@ -93,36 +102,30 @@ taskRoutes.post("/", (req, res) => {
  */
 taskRoutes.put("/:id", (req, res) => {
     let userRequest = req.body;
-    let writePath = path.join(__dirname, "..", "tasks.json");
+    userRequest.task_id = req.params.id;
+    userRequest.updated_at = timestamp();
     let obj = new Object();
-    obj.tasks = JSON.parse(
-        JSON.stringify(
-            taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
-        )
-    );
+    let ifExists = taskData.tasks.filter((tasks) => tasks.task_id == req.params.id).length;
 
-
-
-    obj.tasks.push(userRequest);
-    if (validator.updateValidation(userRequest)) {
-
-        fs.writeFile(writePath, JSON.stringify(obj), {
-            encoding: "utf-8",
-            flag: "w",
-        },
-            (err, data) => {
-                if (err) {
-                    return res.status(500).send("Something went wrong while updating the task");
-                } else {
-                    return res.status(201).send(validator.tasksValidation(userProvidedDetails).message);
-                }
-            }
+    if(ifExists){
+        obj.tasks = JSON.parse(
+            JSON.stringify(
+                taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
+            )
         );
-        let message = new Object();
-        message.message = "Updated successfully"
-        message.body = obj
-        res.status(200).send(message);
-    }
+
+        obj.tasks.push(userRequest);
+        if (validator.updateValidation(userRequest)) {
+
+            if(writeToFile(obj)){
+                res.status(201).send({"message":"task updated successfully"});
+            }else{
+                res.status(500).send({"message":"Something went wrong while updating"});
+            }
+        }
+    }else{
+        res.status(500).send({"message":"Data Not Found"});
+    }    
 });
 
 
@@ -153,5 +156,6 @@ taskRoutes.delete("/:id", (req, res) => {
     );
     res.status(200).send(obj);
 });
+
 
 module.exports = taskRoutes;

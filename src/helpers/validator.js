@@ -2,7 +2,7 @@ class validator {
     static tasksValidation(tasksData, userRequest) {
         if (
             userRequest.hasOwnProperty("task_id") &&
-            userRequest.hasOwnProperty("task") &&
+            userRequest.hasOwnProperty("task_name") &&
             userRequest.hasOwnProperty("task_description") &&
             this.isTasksIdUnique(tasksData, userRequest)
         ) {
@@ -27,19 +27,18 @@ class validator {
         let isIdFound = tasksData.tasks.some(
             (ind) => ind.task_id === userRequest.task_id
         );
-        if (isIdFound) return false;
-        return true;
+        return !(isIdFound);
     }
 
     static updateValidation(userRequest) {
         if (
             userRequest.hasOwnProperty("task_id") &&
-            userRequest.hasOwnProperty("task") &&
+            userRequest.hasOwnProperty("task_name") &&
             userRequest.hasOwnProperty("task_description")
         ) {
             return {
                 status: true,
-                message: "Update successfuly",
+                message: "Updated successfuly",
             };
         } else
             return {

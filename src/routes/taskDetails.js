@@ -3,6 +3,7 @@ const taskData = require("../data/data.json");
 const bodyParser = require("body-parser");
 const writeToFile = require('../helpers/writeToFile')
 const validator = require("../helpers/validator");
+const {filterData,sortByPriority} = require('../helpers/filters');
 const { v4: uuidv4 } = require('uuid');
 const timestamp = require('time-stamp');
 
@@ -25,14 +26,14 @@ taskRoutes.get("/", (req, res) => {
  *  Lists task by id 
  *  Method : GET
  *  Endpoint /api/tasks/id
+ * 
  */
 taskRoutes.get("/:id", (req, res) => {
     res
         .status(200)
         .send(
-            JSON.stringify(
-                taskData.tasks.filter((tasks) => tasks.task_id == req.params.id)
-            )
+            //filter type 1 is to filter by id
+                filterData(req.params.id, 1)
         );
 
 });
@@ -44,18 +45,8 @@ taskRoutes.get("/:id", (req, res) => {
  * Endpoint /api/tasks/priority/{high or low}
  */
 taskRoutes.get("/priority/:prioriy", (req, res) => {
-    let priority = req.params.prioriy;
-    if (priority == "low") {
-        let data = taskData.tasks.sort(function (a, b) {
-            return b.priority - a.priority;
-        });
-        res.status(200).send(data);
-    } else if (priority == "high") {
-        let data = taskData.tasks.sort(function (a, b) {
-            return a.priority - b.priority;
-        });
-        res.status(200).send(data);
-    }
+        res.status(200).send(sortByPriority(req.params.prioriy));
+    
 });
 
 
@@ -73,8 +64,8 @@ taskRoutes.post("/", (req, res) => {
     userRequest.task_name = reqBody.task_name;
     userRequest.task_description = reqBody.task_description;
     userRequest.priority = reqBody.priority;  
-    userRequest.created_at = timestamp();  
-    userRequest.updated_at = timestamp();
+    userRequest.created_at = getTimeStamp();  
+    userRequest.updated_at = getTimeStamp();
 
 
     if (validator.tasksValidation(taskData, userRequest).status) {
@@ -108,16 +99,12 @@ taskRoutes.put("/:id", (req, res) => {
     userRequest.priority = reqBody.priority;  
     userRequest.task_status = reqBody.task_status;
     userRequest.created_at = validator.getCreatedAt(taskData,req.params.id)[0].created_at;
-    userRequest.updated_at = timestamp();
+    userRequest.updated_at = getTimeStamp();
 
     let obj = new Object();
 
     if(validator.updateValidation(taskData,userRequest,userRequest.task_id).status){
-        obj.tasks = JSON.parse(
-            JSON.stringify(
-                taskData.tasks.filter((tasks) => tasks.task_id != req.params.id)
-            )
-        );
+        obj.tasks = filterData(req.params.id,2)
 
         
 
@@ -160,6 +147,10 @@ taskRoutes.delete("/:id", (req, res) => {
     );
     res.status(200).send(obj);
 });
+
+function getTimeStamp(){
+    return timestamp("YYYYMMDDHHmmss")
+}
 
 
 module.exports = taskRoutes;
